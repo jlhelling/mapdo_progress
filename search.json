@@ -39,13 +39,13 @@
     "href": "index.html#hidden-markov-model",
     "title": "Mapd’O Network metrics exploration",
     "section": "Hidden-Markov-Model",
-    "text": "Hidden-Markov-Model\n3-state HMM applied to the cluster series of the Isère River. Modeling is done via the HMM-package, using the Baum-Welch algorithm to fit the model and the Viterbi algorithm to compute most probable path of states."
+    "text": "Hidden-Markov-Model\n\nHMM-packagedepmixS4-package\n\n\n3-state HMM applied to the cluster series of the Isère River. Modeling is done via the HMM-package, using the Baum-Welch algorithm to fit the model and the Viterbi algorithm to compute most probable path of states.\n\n\n\n\n\n\n\n\n\n\nAllows for multivariate modelling of hidden markov chains. First tries below, comparison plot as following:\n\nCluster series on Isère\nHMM as previously presented\ndepmix-model based on clusters\ndepmix-model based on direct values of the four first principal components\n\n\n\nconverged at iteration 55 with logLik: -7424.351"
   },
   {
     "objectID": "index.html#next-steps",
     "href": "index.html#next-steps",
     "title": "Mapd’O Network metrics exploration",
     "section": "Next steps",
-    "text": "Next steps\n\n(ongoing) literature review: most common ways / important variables to characterize the physical properties of river networks and segments\nHMM:\n\ngeographic tree structure\nmultivariate HMM\n\nfurther classification methods:\n\nDBSCAN: density-based clustering (based on 1 - minimum number of group members and 2 - ε-neighborhood, the size and borders of each neighborhood), see https://towardsdatascience.com/a-practical-guide-to-dbscan-method-d4ec5ab2bc99\n\n\nQuestions\n\nMain goal of work? - longitudinal characterisation and segment classification of water courses\nWhich result is expected? (exploratory analysis, package, functional extension of app, …)"
+    "text": "Next steps\n\nremove “holes” in series-representation to fit longitudanal extent of stream segments well\nuse the usethis-package to hide password of database access\nadvance with dependent mixture / HMM model :\n\nmultivariate modelling with depmixS4-package\nCan river network be modelled through a geographic tree structure and not a unidirectional chain, e.g. as in Jiang et al. (2019) ?\n\nstart learning R-Shiny development (e.g. with Lise’s course and ThinkR material)"
   }
 ]

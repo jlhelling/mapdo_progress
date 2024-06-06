@@ -1,6 +1,6 @@
 ---
 title: "Mapd'O Network metrics exploration"
-subtitle: "Progress meeting 22.04.2024"
+subtitle: "Progress meeting 23.04.2024"
 author: "Leo Helling"
 title-slide-attributes:
   data-background-color: "#023e8a"

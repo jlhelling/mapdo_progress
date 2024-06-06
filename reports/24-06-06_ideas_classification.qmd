@@ -23,3 +23,13 @@ land use category with highest share of valley bottom area.
 -   agricultural land
 
 -   natural land (forest & grassland)
+
+## Confinement
+
+proposed confinement index from 0-1 divided into 4 classes:
+
+-   strongly confined
+-   confined
+-   weakly confined
+-   unconfined
+

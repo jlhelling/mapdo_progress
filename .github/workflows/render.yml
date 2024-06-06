@@ -1,0 +1,48 @@
+name: Render and Update Report
+
+on:
+  push:
+    paths:
+      - 'reports/*.qmd'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up R
+      uses: r-lib/actions/setup-r@v2
+
+    - name: Install Quarto
+      run: |
+        wget https://quarto.org/download/latest/quarto-linux-amd64.deb
+        sudo dpkg -i quarto-linux-amd64.deb
+
+    - name: Find latest report
+      id: find_latest_report
+      run: |
+        latest_report=$(ls -t reports/*.qmd | head -n 1)
+        echo "latest_report=$latest_report" >> $GITHUB_ENV
+
+    - name: Render latest report
+      run: |
+        Rscript -e 'library(quarto); quarto_render(Sys.getenv("latest_report"), output_dir = "output")'
+
+    - name: Find latest HTML output
+      id: find_latest_output
+      run: |
+        latest_output=$(ls -t output/*.html | head -n 1)
+        echo "latest_output=$latest_output" >> $GITHUB_ENV
+
+    - name: Update index.html
+      run: |
+        cp "$latest_output" index.html
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.name 'github-actions'
+        git config --global user.email 'github-actions@github.com'
+        git add index.html
+        git commit -m "Update index.html to latest report"
+        git push origin main

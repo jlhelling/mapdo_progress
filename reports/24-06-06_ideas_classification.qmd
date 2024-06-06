@@ -1,0 +1,25 @@
+---
+title: "Ideas for physical classifications of river networks"
+subtitle: "Progress meeting 22.04.2024"
+author: "Leo Helling"
+title-slide-attributes:
+  data-background-color: "#023e8a"
+---
+
+## first ideas
+
+-   dominant land use
+-   Urban pressure
+-   Agricultural pressure
+-   Confinement
+-   Stream Power Index
+
+## Dominant land use
+
+land use category with highest share of valley bottom area.
+
+-   urban areas + infrastructure
+
+-   agricultural land
+
+-   natural land (forest & grassland)

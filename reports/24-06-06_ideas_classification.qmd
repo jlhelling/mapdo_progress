@@ -13,6 +13,8 @@ title-slide-attributes:
 -   Agricultural pressure
 -   Confinement
 -   Stream Power Index
+-   Sinuosity
+-   Channel Pattern
 
 ## Dominant land use
 

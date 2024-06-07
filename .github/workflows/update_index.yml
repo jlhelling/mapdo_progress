@@ -23,7 +23,7 @@ jobs:
     - name: Update index.html and report files
       run: |
         cp "${{ env.latest_output }}" index.html
-        cp -r "${{ env.latest_folder }}" $GITHUB_WORKSPACE
+        cp -r "${{ env.latest_folder }}" index_files
 
     - name: Commit and push changes
       env:

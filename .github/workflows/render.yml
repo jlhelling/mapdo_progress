@@ -3,60 +3,24 @@ name: Render and Update Report
 on:
   push:
     paths:
-      - 'reports/*.qmd'
+      - 'output/reports/*'
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      R_LIBS_USER: C:/Users/jhelling/AppData/Local/R/win-library/4.3
 
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up R
-      uses: r-lib/actions/setup-r@v2
-      with:
-        r-version: '4.3.3'
-
-    - name: Install R packages cache
-      uses: actions/cache@v2
-      with:
-        path: ${{ env.R_LIBS_USER }}
-        key: ${{ runner.os }}-r-${{ hashFiles('**/*.qmd') }}
-        restore-keys: ${{ runner.os }}-r-
-
-    - name: Install Quarto
-      run: |
-        wget https://quarto.org/download/latest/quarto-linux-amd64.deb
-        sudo dpkg -i quarto-linux-amd64.deb
-
-    - name: Install R dependencies
-      run: |
-        Rscript -e 'install.packages("remotes", repos="https://cran.rstudio.com")'
-        Rscript -e 'remotes::install_github("quarto-dev/quarto-r")'
-      env:
-        R_LIBS_USER: ${{ github.workspace }}/R-library
-
-    - name: Find latest report
-      id: find_latest_report
-      run: |
-        latest_report=$(ls -t reports/*.qmd | head -n 1)
-        echo "latest_report=$latest_report" >> $GITHUB_ENV
-
-    - name: Render latest report
-      run: |
-        quarto render "$latest_report" --output-dir output
-
     - name: Find latest HTML output
       id: find_latest_output
       run: |
-        latest_output=$(ls -t output/*.html | head -n 1)
+        latest_output=$(ls -t output/reports/*.html | head -n 1)
         echo "latest_output=$latest_output" >> $GITHUB_ENV
 
     - name: Update index.html
       run: |
-        cp "$latest_output" index.html
+        cp "${{ env.latest_output }}" index.html
 
     - name: Commit and push changes
       run: |

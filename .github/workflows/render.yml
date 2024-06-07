@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      R_LIBS_USER: ${{ github.workspace }}/R/win-library/4.3
+      R_LIBS_USER: C:/Users/jhelling/AppData/Local/R/win-library/4.3
 
     steps:
     - uses: actions/checkout@v2

@@ -24,11 +24,11 @@ jobs:
 
     - name: Commit and push changes
       env:
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.TOKEN_GH }}
       run: |
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
-        git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git
+        git remote set-url origin https://x-access-token:${{ secrets.TOKEN_GH }}@github.com/${{ github.repository }}.git
         git add index.html
         git commit -m "Update index.html to latest report"
         git push origin HEAD:main

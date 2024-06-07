@@ -32,7 +32,7 @@ land use category with highest share of valley bottom area.
 
 -   \>40 % urbanised
 
--   \>10 % sligthly urbanised
+-   \>10 % moderately urbanised
 
 -   \>0 % no urban land
 

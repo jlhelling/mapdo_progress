@@ -23,9 +23,11 @@ jobs:
         cp "${{ env.latest_output }}" index.html
 
     - name: Commit and push changes
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
         git add index.html
         git commit -m "Update index.html to latest report"
-        git push origin main
+        git push https://${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main

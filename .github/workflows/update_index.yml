@@ -1,4 +1,4 @@
-ename: Render and Update Report
+name: Render and Update Report
 
 on:
   push:

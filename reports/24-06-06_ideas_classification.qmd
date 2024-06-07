@@ -24,6 +24,18 @@ land use category with highest share of valley bottom area.
 
 -   natural land (forest & grassland)
 
+## Urban pressure
+
+4 classes based on degree of urban landuse (could also be accumulated urban landuse from upstream areas!)
+
+-   \>70 % highly urbanised
+
+-   \>40 % urbanised
+
+-   \>10 % sligthly urbanised
+
+-   \>0 % no urban land
+
 ## Confinement
 
 proposed confinement index from 0-1 divided into 4 classes:

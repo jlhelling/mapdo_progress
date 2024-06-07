@@ -17,10 +17,14 @@ jobs:
       run: |
         latest_output=$(ls -t output/reports/*.html | head -n 1)
         echo "latest_output=$latest_output" >> $GITHUB_ENV
+        folder_name=$(basename "$latest_output" .html)_files
+        echo "latest_output=$latest_output" >> $GITHUB_ENV
+        echo "folder_name=$folder_name" >> $GITHUB_ENV
 
-    - name: Update index.html
+    - name: Update index.html and report files
       run: |
         cp "${{ env.latest_output }}" index.html
+        cp -r "${{ env.folder_name }}" $GITHUB_WORKSPACE
 
     - name: Commit and push changes
       env:
@@ -29,7 +33,6 @@ jobs:
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
         git remote set-url origin https://x-access-token:${{ secrets.TOKEN_GH }}@github.com/${{ github.repository }}.git
-        git add index.html
-        git commit -m "Update index.html to latest report"
-        git push origin HEAD:main
-
+        git add index.html  $GITHUB_WORKSPACE/${{ env.folder_name }}
+        git commit -m "Update index.html and report files to latest report"
+        git push https://${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main

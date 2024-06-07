@@ -132,3 +132,4 @@ plot_categ <- function(data, x, cat, colors){
   
   return(plot)
 }
+

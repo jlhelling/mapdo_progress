@@ -15,8 +15,8 @@ require(DataExplorer) # general dataset exploration
 library(factoextra) # for pca-biplots 
 library(sf) # geospatial manipulations
 library(mapview) # geospatial visualisation
-source("src/f_explo.R")
-source("src/f_database.R")
+source("~/repositories/mapdo_progress-reports/src/f_explo.R")
+source("~/repositories/mapdo_progress-reports/src/f_database.R")
 
 # load network metrics
 network_metrics <- load_network_metrics()

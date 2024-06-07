@@ -1,4 +1,4 @@
-name: Render and Update Report
+ename: Render and Update Report
 
 on:
   push:
@@ -32,6 +32,6 @@ jobs:
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
         git remote set-url origin https://x-access-token:${{ secrets.TOKEN_GH }}@github.com/${{ github.repository }}.git
-        git add index.html  $GITHUB_WORKSPACE/${{ env.latest_folder }}
+        git add index.html  index_files/
         git commit -m "Update index.html and report files to latest report"
         git push https://${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main

@@ -8,7 +8,7 @@ title-slide-attributes:
 
 ## first ideas
 
--   dominant land use
+-   Dominant land use
 -   Urban pressure
 -   Agricultural pressure
 -   Confinement

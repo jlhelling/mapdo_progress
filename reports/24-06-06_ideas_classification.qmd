@@ -36,6 +36,16 @@ land use category with highest share of valley bottom area.
 
 -   \>0 % no urban land
 
+## Agricultural impact
+
+-   \>70 % strong agricultural impact
+
+-   \>40 % high agricultural impact
+
+-   \>10 % moderate agricultural impact
+
+-   \>0 % no agricultural impact
+
 ## Confinement
 
 proposed confinement index from 0-1 divided into 4 classes:

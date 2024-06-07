@@ -22,7 +22,7 @@ land use category with highest share of valley bottom area.
 
 -   agricultural land
 
--   natural land (forest & grassland)
+-   natural land (forest & grassland) s
 
 ## Urban pressure
 

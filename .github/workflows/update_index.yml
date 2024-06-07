@@ -3,7 +3,7 @@ name: Render and Update Report
 on:
   push:
     paths:
-      - 'output/reports/*'
+      - 'reports/*'
 
 jobs:
   build:
@@ -15,15 +15,18 @@ jobs:
     - name: Find latest HTML output
       id: find_latest_output
       run: |
-        latest_output=$(ls -t output/reports/*.html | head -n 1)
+        latest_output=$(ls -t reports/*.html | head -n 1)
         echo "latest_output=$latest_output" >> $GITHUB_ENV
         latest_folder=$(echo $latest_output | sed 's/\.html/_files/')
         echo "latest_folder=$latest_folder" >> $GITHUB_ENV
 
-    - name: Update index.html and report files
+    - name: Create docs directory
+      run: mkdir -p docs
+
+    - name: Copy report files to docs
       run: |
-        cp "${{ env.latest_output }}" index.html
-        cp -r "${{ env.latest_folder }}" index_files
+        cp "${{ env.latest_output }}" docs/index.html
+        cp -r "${{ env.latest_folder }}" docs/
 
     - name: Commit and push changes
       env:
@@ -32,6 +35,6 @@ jobs:
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
         git remote set-url origin https://x-access-token:${{ secrets.TOKEN_GH }}@github.com/${{ github.repository }}.git
-        git add index.html  index_files/
-        git commit -m "Update index.html and report files to latest report"
+        git add docs/
+        git commit -m "Update report files to latest report"
         git push https://${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main

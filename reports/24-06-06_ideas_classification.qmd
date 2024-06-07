@@ -44,7 +44,7 @@ land use category with highest share of valley bottom area.
 
 -   \>10 % moderate agricultural impact
 
--   \>0 % no agricultural impact at all
+-   \>0 % no agricultural impact
 
 ## Confinement
 

@@ -8,8 +8,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    
     steps:
+    - name: Remove existing docs folder
+      run: rm -rf docs
+
     - uses: actions/checkout@v2
 
     - name: Find latest HTML output

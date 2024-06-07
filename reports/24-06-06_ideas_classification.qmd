@@ -12,7 +12,7 @@ title-slide-attributes:
 -   Urban pressure
 -   Agricultural pressure
 -   Confinement
--   Stream Power Index
+-   Stream Power
 -   Sinuosity
 -   Channel Pattern
 

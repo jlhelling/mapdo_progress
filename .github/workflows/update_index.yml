@@ -17,14 +17,13 @@ jobs:
       run: |
         latest_output=$(ls -t output/reports/*.html | head -n 1)
         echo "latest_output=$latest_output" >> $GITHUB_ENV
-        folder_name=$(basename "$latest_output" .html)_files
-        echo "latest_output=$latest_output" >> $GITHUB_ENV
+        latest_folder=$(echo $latest_output | sed 's/\.html/_files/')
         echo "folder_name=$folder_name" >> $GITHUB_ENV
 
     - name: Update index.html and report files
       run: |
         cp "${{ env.latest_output }}" index.html
-        cp -r "${{ env.folder_name }}" $GITHUB_WORKSPACE
+        cp -r "${{ env.latest_folder }}" $GITHUB_WORKSPACE
 
     - name: Commit and push changes
       env:

@@ -6,10 +6,24 @@ title-slide-attributes:
   data-background-color: "#023e8a"
 ---
 
+```{r load data}
+#| echo: false
+#| output: false
+
+library(tidyverse)
+library(sf)
+library(leaflet)
+source("~/repositories/mapdo_progress/src/f_classification.R")
+load("~/repositories/mapdo_progress/data/network_dgo.rda")
+
+axis <- network_dgo
+
+```
+
 ## first ideas
 
 -   Dominant land use
--   Urban pressure
+-   Urban pressures
 -   Agricultural pressure
 -   Confinement
 -   Stream Power
@@ -26,51 +40,179 @@ land use category with highest share of valley bottom area.
 
 -   natural land (forest & grassland)
 
+```{r plot dominant land use}
+#| echo: false
+#| warning: false
+
+df_dom_lu <- autoclass_dom_landuse(axis)
+
+
+leaflet::leaflet(df_dom_lu) |> 
+  addProviderTiles(providers$CartoDB.Positron) |> 
+  addPolylines(color = df_dom_lu$color, opacity = 1) |> 
+  addLegend(color = unique(df_dom_lu$color), labels = unique(df_dom_lu$metric_max))
+```
+
 ## Urban pressure
 
 4 classes based on degree of urban landuse (could also be accumulated urban landuse from upstream areas!)
 
 -   \>70 % highly urbanised
-
 -   \>40 % urbanised
-
 -   \>10 % moderately urbanised
-
 -   \>0 % no urban land
+
+```{r plot urban land use}
+#| echo: false
+#| warning: false
+
+df_classified_pc <- autoclass_pressures_pc(axis)
+
+
+leaflet::leaflet(df_classified_pc) |> 
+  addProviderTiles(providers$CartoDB.Positron) |> 
+  addPolylines(color = df_classified_pc$color_urban, opacity = 1) |> 
+  addLegend(color = unique(df_classified_pc$color_urban), labels = unique(df_classified_pc$class_urban))
+
+```
 
 ## Agricultural impact
 
 -   \>70 % strong agricultural impact
-
 -   \>40 % high agricultural impact
-
 -   \>10 % moderate agricultural impact
-
 -   \>0 % no agricultural impact at all
+
+```{r plot agricultural impact}
+#| echo: false
+#| warning: false
+
+
+leaflet::leaflet(df_classified_pc) |> 
+  addProviderTiles(providers$CartoDB.Positron) |> 
+  addPolylines(color = df_classified_pc$color_crops, opacity = 1) |> 
+  addLegend(color = unique(df_classified_pc$color_crops), labels = unique(df_classified_pc$class_crops))
+```
+
+## Natural landuse
+
+-   \>70 % very strong natural landuse
+-   \>40 % strong natural landuse
+-   \>10 % moderate natural landuse
+-   \>0 % no natural landuse
+
+```{r plot natural impact}
+#| echo: false
+#| warning: false
+
+
+leaflet::leaflet(df_classified_pc) |> 
+  addProviderTiles(providers$CartoDB.Positron) |> 
+  addPolylines(color = df_classified_pc$color_natural, opacity = 1) |> 
+  addLegend(color = unique(df_classified_pc$color_natural), labels = unique(df_classified_pc$class_natural))
+```
+
 
 ## Confinement
 
-proposed confinement index from 0-1 divided into 4 classes:
+Proposed confinement index from 0-1 divided into 4 classes:
 
--   strongly confined
--   confined
--   weakly confined
--   unconfined
+-   strongly confined: \> 0
+-   confined: \> 0.25
+-   weakly confined \> 0.5
+-   unconfined \> 0.75
+
+based on the ratio between the active channel width and the valley bottom width
+
+```{r plot confinement classes}
+#| echo: false
+#| warning: false
+
+leaflet::leaflet(df_classified_pc) |> 
+  addProviderTiles(providers$CartoDB.Positron) |> 
+  addPolylines(color = df_classified_pc$color_confinement, opacity = 1) |> 
+  addLegend(color = unique(df_classified_pc$color_confinement), labels = unique(df_classified_pc$class_confinement))
+```
+
+
+## Riparian Zone Condition / Habitat Connectivity
+
+based on share of natural and connected corridor
+
+
+## Active Channel Space
+
+Proposed confinement index from 0-1 divided into 4 classes:
+
+-   abundant space: \> 70
+-   space: \> 40
+-   moderate space \> 10
+-   confined \> 0
+
+based on the ratio between the active channel width and the valley bottom width
+
+```{r plot active channel classes}
+#| echo: false
+#| warning: false
+
+leaflet::leaflet(df_classified_pc) |> 
+  addProviderTiles(providers$CartoDB.Positron) |> 
+  addPolylines(color = df_classified_pc$color_ac, opacity = 1) |> 
+  addLegend(color = unique(df_classified_pc$color_ac), labels = unique(df_classified_pc$class_ac))
+```
+
 
 ## Stream Power
 
-idea: get discharge values from RHT network and calculate Streampower for each segment:
-
+***Idea:** get discharge values from RHT network and calculate Streampower for each segment:*
+  
+  $$
+  \Omega=\rho g Q S
 $$
-\Omega=\rho g Q S
-$$
+  
+  `Ω` is the stream power, `ρ` is the density of water (1000 kg/m^3^), `g` is gravitational acceleration (9.8 m/s^2^ ), `Q` is Discharge (m^3^/s), and `S` is the channel slope.
 
-''Ω'' is the stream power, ''ρ'' is the density of water (1000 kg/m\^3), ''g'' is Gravitational acceleration (9.8 m/s 2 ), ''Q'' is/ Discharge (m3/s), and ''S'' is the channel slope.
 
 ## Sinuosity
 
+
 ## Channel Pattern
+
 
 ## Bed Material
 
 based on grainsize distribution
+
+
+## Flow regime
+
+perennial or intermittent?
+
+
+## Elevation zones
+
+lowland, mid-elevation, slope
+
+
+## Gravel Bars presence
+
+Absent, occasional, frequent
+
+
+## Slope Gradient
+
+low, medium, high
+
+
+## Fragmentation
+
+based on barriers present upstream
+
+
+## Integrated Approach
+
+An integrated classification approach can also be valuable. This involves combining multiple data layers to create composite classes. For example:
+
+Geomorpho-Ecological Classification: Combining geomorphological features with ecological conditions (e.g., highland forested streams, lowland agricultural streams).
+
+Hydro-Morphological Classification: Integrating hydrological regime with physical channel characteristics (e.g., perennial wide-shallow streams, ephemeral narrow-deep streams).

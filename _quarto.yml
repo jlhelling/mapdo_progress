@@ -1,5 +1,6 @@
 project:
   title: "mapdo_progress"
+  post-render: src/f_quarto.R
 
 editor: visual
 

@@ -13,6 +13,7 @@ title-slide-attributes:
 library(tidyverse)
 library(sf)
 library(leaflet)
+library(leaflet.extras)
 source("~/repositories/mapdo_progress/src/f_classification.R")
 load("~/repositories/mapdo_progress/data/network_dgo.rda")
 
@@ -29,6 +30,32 @@ axis <- network_dgo
 -   Stream Power
 -   Sinuosity
 -   Channel Pattern
+
+
+## Topography
+
+based on height and slope, e.g.
+
+- plaines de basse altitude (\> 0 m & \< 5 % slope)
+- plaines de moyenne altitude (\> 300 m & \< 5 % slope)
+- plaines de montagne (\> 1000 m & \< 5 % slope)
+- pentes de basse altitude (\> 0 m & \> 5 % slope)
+- pentes de moyenne altitude (\> 300 m & \> 5 % slope)
+- pentes de montagne (\> 1000 m & \> 5 % slope)
+
+```{r plot topographical classes}
+#| echo: false
+#| warning: false
+
+
+df_classified_pc <- autoclass_pressures_pc(axis)
+
+leaflet::leaflet(df_classified_pc) |> 
+  addProviderTiles(providers$CartoDB.Positron) |> 
+  addPolylines(color = df_classified_pc$color_topo, opacity = 1) |> 
+  addLegend(color = unique(df_classified_pc$color_topo), labels = unique(df_classified_pc$class_topo))
+```
+
 
 ## Dominant land use
 
@@ -65,9 +92,6 @@ leaflet::leaflet(df_dom_lu) |>
 ```{r plot urban land use}
 #| echo: false
 #| warning: false
-
-df_classified_pc <- autoclass_pressures_pc(axis)
-
 
 leaflet::leaflet(df_classified_pc) |> 
   addProviderTiles(providers$CartoDB.Positron) |> 
@@ -176,6 +200,40 @@ leaflet::leaflet(df_classified_pc) |>
 ```
 
 
+## Gravel Bars presence
+
+Absent, occasional, frequent
+
+```{r plot gravel classes}
+#| echo: false
+#| warning: false
+
+leaflet::leaflet(df_classified_pc) |> 
+  addProviderTiles(providers$CartoDB.Positron) |> 
+  addPolylines(color = df_classified_pc$color_gravel, opacity = 1) |> 
+  addLegend(color = unique(df_classified_pc$color_gravel), labels = unique(df_classified_pc$class_gravel))
+```
+
+
+## Water channel size evolution
+
+*indicate channel size reductions on the stream network downwards* 
+
+ - grandissant
+ - stable
+ - diminuant
+ 
+```{r plot water channel size classes}
+#| echo: false
+#| warning: false
+
+leaflet::leaflet(df_classified_pc) |> 
+  addProviderTiles(providers$CartoDB.Positron) |> 
+  addPolylines(color = df_classified_pc$color_wsize, opacity = 1) |> 
+  addLegend(color = unique(df_classified_pc$color_wsize), labels = unique(df_classified_pc$class_wsize)) |> 
+  leaflet.extras::addSearchOSM(options = searchOptions()) 
+```
+
 ## Stream Power
 
 ***Idea:** get discharge values from RHT network and calculate Streampower for each segment:*
@@ -201,32 +259,6 @@ based on grainsize distribution
 ## Flow regime
 
 perennial or intermittent?
-
-
-## Topography
-
-based on height and slope, e.g.
-
-- plaines de basse altitude (\> 0 m & \< 5 % slope)
-- plaines de moyenne altitude (\> 300 m & \< 5 % slope)
-- plaines de montagne (\> 1000 m & \< 5 % slope)
-- pentes de basse altitude (\> 0 m & \> 5 % slope)
-- pentes de moyenne altitude (\> 300 m & \> 5 % slope)
-- pentes de montagne (\> 1000 m & \> 5 % slope)
-
-```{r plot topographical classes}
-#| echo: false
-#| warning: false
-
-leaflet::leaflet(df_classified_pc) |> 
-  addProviderTiles(providers$CartoDB.Positron) |> 
-  addPolylines(color = df_classified_pc$color_topo, opacity = 1) |> 
-  addLegend(color = unique(df_classified_pc$color_topo), labels = unique(df_classified_pc$class_topo))
-```
-
-## Gravel Bars presence
-
-Absent, occasional, frequent
 
 
 ## Slope Gradient

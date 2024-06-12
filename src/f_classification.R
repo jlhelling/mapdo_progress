@@ -79,6 +79,12 @@ autoclass_pressures_pc <- function(df){
   vars_habitat <- c("très bien connecté", "bien connecté", "moyen connecté", "faible / absente")
   colors_habitat <- c("#2d6a4f", "#99d98c", "#fff3b0", "#ba181b") |> setNames(vars_habitat)
   
+  vars_gravel <- c("abundant", "moyennement présente", "absent")
+  colors_gravel <- c("#603808", "#e7bc91", "#0077b6") |> setNames(vars_gravel)
+  
+  vars_wsize <- c("grandissant", "stable", "diminuant")
+  colors_wsize <- c("#2b9348", "#d8f3dc", "#ee6055") |> setNames(vars_wsize)
+  
   classified_df <- df %>%
     rowwise() %>%
     mutate(
@@ -131,7 +137,7 @@ autoclass_pressures_pc <- function(df){
           active_channel_pc >= 10 ~ vars[[3]],
           active_channel_pc >= 0 ~ vars[[4]],
         ),
-      color_ac = colors_confinement[[class_ac]], 
+      color_ac = colors_ac[[class_ac]], 
       
       # topography
       class_topo =
@@ -155,6 +161,29 @@ autoclass_pressures_pc <- function(df){
         ),
       color_habitat = colors_habitat[[class_habitat]], 
       
+      # gravel bars
+      class_gravel =
+        case_when(
+          (gravel_bars/(water_channel+0.00001) >= 0.5) ~ vars_gravel[[1]],
+          (gravel_bars/(water_channel+0.00001) > 0) ~ vars_gravel[[2]],
+          (gravel_bars/(water_channel+0.00001) == 0) ~ vars_gravel[[3]]
+        ),
+      color_gravel = colors_gravel[[class_gravel]]
+
     ) %>%
-    ungroup()
+    ungroup() %>%
+    mutate(water_channel_lag = lead(water_channel, 1, default = 0)) %>% 
+    rowwise() %>%
+    mutate(
+      # channel size
+      class_wsize =
+        case_when(
+          (water_channel > water_channel_lag) ~ vars_wsize[[1]],
+          (water_channel == water_channel_lag) ~ vars_wsize[[2]],
+          (water_channel < water_channel_lag) ~ vars_wsize[[3]]
+        ),
+      color_wsize = colors_wsize[[class_wsize]]
+    ) %>%
+    ungroup() %>%
+    select(!water_channel_lag)
 }

@@ -135,9 +135,23 @@ leaflet::leaflet(df_classified_pc) |>
 ```
 
 
-## Riparian Zone Condition / Habitat Connectivity
+## Habitat Connectivity
 
-based on share of natural and connected corridor
+based on share of connected corridor (includes active channel, natural corridor and semi-natural corridors) from valley bottom
+OR based on share of connected corridor from valley bottom excluding the active channel area
+OR based on the ratio of connected corridor width to active channel width !
+
+Example based on connected corridor share:
+
+```{r plot habitat classes}
+#| echo: false
+#| warning: false
+
+leaflet::leaflet(df_classified_pc) |> 
+  addProviderTiles(providers$CartoDB.Positron) |> 
+  addPolylines(color = df_classified_pc$color_habitat, opacity = 1) |> 
+  addLegend(color = unique(df_classified_pc$color_habitat), labels = unique(df_classified_pc$class_habitat))
+```
 
 
 ## Active Channel Space
@@ -189,10 +203,26 @@ based on grainsize distribution
 perennial or intermittent?
 
 
-## Elevation zones
+## Topography
 
-lowland, mid-elevation, slope
+based on height and slope, e.g.
 
+- plaines de basse altitude (\> 0 m & \< 5 % slope)
+- plaines de moyenne altitude (\> 300 m & \< 5 % slope)
+- plaines de montagne (\> 1000 m & \< 5 % slope)
+- pentes de basse altitude (\> 0 m & \> 5 % slope)
+- pentes de moyenne altitude (\> 300 m & \> 5 % slope)
+- pentes de montagne (\> 1000 m & \> 5 % slope)
+
+```{r plot topographical classes}
+#| echo: false
+#| warning: false
+
+leaflet::leaflet(df_classified_pc) |> 
+  addProviderTiles(providers$CartoDB.Positron) |> 
+  addPolylines(color = df_classified_pc$color_topo, opacity = 1) |> 
+  addLegend(color = unique(df_classified_pc$color_topo), labels = unique(df_classified_pc$class_topo))
+```
 
 ## Gravel Bars presence
 
@@ -211,7 +241,7 @@ based on barriers present upstream
 
 ## Integrated Approach
 
-An integrated classification approach can also be valuable. This involves combining multiple data layers to create composite classes. For example:
+An integrated classification approach involves combining multiple metrics to create composite classes. For example:
 
 Geomorpho-Ecological Classification: Combining geomorphological features with ecological conditions (e.g., highland forested streams, lowland agricultural streams).
 

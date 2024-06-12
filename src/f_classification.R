@@ -65,6 +65,19 @@ autoclass_pressures_pc <- function(df){
   colors_crops <- c("#bc3908", "#ff7b00", "#ffdd00", "#fff3b0") |> setNames(vars)
   colors_natural <- c("#081c15", "#2d6a4f", "#74c69d", "#d8f3dc") |> setNames(vars)
   colors_confinement <- c("#184e77", "#168aad", "#99d98c", "#d9ed92") |> setNames(vars)
+  colors_ac <- c("#184e77", "#168aad", "#99d98c", "#d9ed92") |> setNames(vars)
+  
+  vars_topo <- c("plaines de basse altitude",
+                 "plaines de moyenne altitude",
+                 "plaines de montagne",
+                 "pentes de basse altitude",
+                 "pentes de moyenne altitude",
+                 "pentes de montagne")
+  colors_topo <- c("#d9ed92", "#74c69d", "#184e77",
+                   "#ffdd00", "#bc3908", "#6a040f") |> setNames(vars_topo)
+  
+  vars_habitat <- c("très bien connecté", "bien connecté", "moyen connecté", "faible / absente")
+  colors_habitat <- c("#2d6a4f", "#99d98c", "#fff3b0", "#ba181b") |> setNames(vars_habitat)
   
   classified_df <- df %>%
     rowwise() %>%
@@ -118,7 +131,29 @@ autoclass_pressures_pc <- function(df){
           active_channel_pc >= 10 ~ vars[[3]],
           active_channel_pc >= 0 ~ vars[[4]],
         ),
-      color_ac = colors_confinement[[class_ac]]
+      color_ac = colors_confinement[[class_ac]], 
+      
+      # topography
+      class_topo =
+        case_when(
+          (talweg_elevation_min >= 1000 & talweg_slope < 5) ~ vars_topo[[3]],
+          (talweg_elevation_min >= 300 & talweg_slope < 5) ~ vars_topo[[2]],
+          (talweg_elevation_min >= -50 & talweg_slope < 5) ~ vars_topo[[1]],
+          (talweg_elevation_min >= 1000 & talweg_slope >= 5) ~ vars_topo[[6]],
+          (talweg_elevation_min >= 300 & talweg_slope >= 5) ~ vars_topo[[5]],
+          (talweg_elevation_min >= -50 & talweg_slope >= 5) ~ vars_topo[[4]],
+        ),
+      color_topo = colors_topo[[class_topo]], 
+      
+      # habitat connectivity
+      class_habitat =
+        case_when(
+          (riparian_corridor_pc+semi_natural_pc >= 70) ~ vars_habitat[[1]],
+          (riparian_corridor_pc+semi_natural_pc >= 40) ~ vars_habitat[[2]],
+          (riparian_corridor_pc+semi_natural_pc >= 10) ~ vars_habitat[[3]],
+          (riparian_corridor_pc+semi_natural_pc >= 0) ~ vars_habitat[[4]]
+        ),
+      color_habitat = colors_habitat[[class_habitat]], 
       
     ) %>%
     ungroup()

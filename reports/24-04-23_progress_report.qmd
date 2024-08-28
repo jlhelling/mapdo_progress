@@ -432,41 +432,41 @@ plot_jitterboxplots_pca(data_cleaned_pc |> dplyr::filter(fid <= 9041 & fid >= 76
 
 Based on the data-distributions, the main characteristics of the clusters are summarized in the following table:
 
-+----------+---------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Cluster  | Derived characteristics                                                                                                                                 |
-+==========+=========================================================================================================================================================+
-| **1**    | **Rivers confined by anthropogenized floodplain**                                                                                                       |
-|          |                                                                                                                                                         |
-|          | Rather confined, lower elevation rivers with altered riparian zone including diverse usages such as urban and agricultural infrastructure.              |
-|          |                                                                                                                                                         |
-|          | -   above average values: `PC4`, `PC1`                                                                                                                  |
-+----------+---------------------------------------------------------------------------------------------------------------------------------------------------------+
-| **2**    | **Larger rivers with agricultural landscape**                                                                                                           |
-|          |                                                                                                                                                         |
-|          | Larger rivers in wide valleys with low slopes and low elevations, with semi-intensive riparian corridor use due to agricultural activity.               |
-|          |                                                                                                                                                         |
-|          | -   above average values: `PC1`                                                                                                                         |
-|          |                                                                                                                                                         |
-|          | -   below average: `PC2`, `PC4`                                                                                                                         |
-+----------+---------------------------------------------------------------------------------------------------------------------------------------------------------+
-| **3**    | **Small upstream rivers**                                                                                                                               |
-|          |                                                                                                                                                         |
-|          | Smaller and unforested riparian corridors in higher elevations and with more natural open areas and grasslands and less activity in the adjacent areas. |
-|          |                                                                                                                                                         |
-|          | -   below average values: `PC1`, `PC3`                                                                                                                  |
-+----------+---------------------------------------------------------------------------------------------------------------------------------------------------------+
-| **4**    | **Forested medium-sized rivers**                                                                                                                        |
-|          |                                                                                                                                                         |
-|          | Large and forested riparian corridors in lower elevations with few grassland and natural open area.                                                     |
-|          |                                                                                                                                                         |
-|          | -   above average values: `PC3`                                                                                                                         |
-+----------+---------------------------------------------------------------------------------------------------------------------------------------------------------+
-| **5**    | **Diverse medium-sized and large rivers**                                                                                                               |
-|          |                                                                                                                                                         |
-|          | Medium-sized and larger streams in lower elevations with different landuse patterns and active channel sizes.                                           |
-|          |                                                                                                                                                         |
-|          | -   above average values: `PC1`, `PC2`, `PC3`                                                                                                           |
-+----------+---------------------------------------------------------------------------------------------------------------------------------------------------------+
++---------+---------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Cluster | Derived characteristics                                                                                                                                 |
++=========+=========================================================================================================================================================+
+| **1**   | **Rivers confined by anthropogenized floodplain**                                                                                                       |
+|         |                                                                                                                                                         |
+|         | Rather confined, lower elevation rivers with altered riparian zone including diverse usages such as urban and agricultural infrastructure.              |
+|         |                                                                                                                                                         |
+|         | -   above average values: `PC4`, `PC1`                                                                                                                  |
++---------+---------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **2**   | **Larger rivers with agricultural landscape**                                                                                                           |
+|         |                                                                                                                                                         |
+|         | Larger rivers in wide valleys with low slopes and low elevations, with semi-intensive riparian corridor use due to agricultural activity.               |
+|         |                                                                                                                                                         |
+|         | -   above average values: `PC1`                                                                                                                         |
+|         |                                                                                                                                                         |
+|         | -   below average: `PC2`, `PC4`                                                                                                                         |
++---------+---------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **3**   | **Small upstream rivers**                                                                                                                               |
+|         |                                                                                                                                                         |
+|         | Smaller and unforested riparian corridors in higher elevations and with more natural open areas and grasslands and less activity in the adjacent areas. |
+|         |                                                                                                                                                         |
+|         | -   below average values: `PC1`, `PC3`                                                                                                                  |
++---------+---------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **4**   | **Forested medium-sized rivers**                                                                                                                        |
+|         |                                                                                                                                                         |
+|         | Large and forested riparian corridors in lower elevations with few grassland and natural open area.                                                     |
+|         |                                                                                                                                                         |
+|         | -   above average values: `PC3`                                                                                                                         |
++---------+---------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **5**   | **Diverse medium-sized and large rivers**                                                                                                               |
+|         |                                                                                                                                                         |
+|         | Medium-sized and larger streams in lower elevations with different landuse patterns and active channel sizes.                                           |
+|         |                                                                                                                                                         |
+|         | -   above average values: `PC1`, `PC2`, `PC3`                                                                                                           |
++---------+---------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 : Characteristics of clusters
 

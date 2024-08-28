@@ -31,17 +31,82 @@ axis <- network_dgo
 -   Sinuosity
 -   Channel Pattern
 
+## overview table
+
+```{r table create}
+#| echo: false
+#| warning: false
+
+library(reactable)
+
+df <- tibble(
+  class = c(
+    "Nombre de Strahler",
+    "Topographie",
+    "Utilisation dominante des sols",
+    "Pression urbaine",
+    "Pression agricole",
+    "Utilisation naturelle des sols",
+    "Confinement de la bande active",
+    "Connectivité des habitats riverains",
+    "Présence de bancs de galets",
+    "Évolution de la taille du chenal de l'eau"
+  ),
+  description = c(
+    "Répresent la complexité du réseaux hdrographique. Le nombre de Strahler est de 1 pour tout cours d'eau entre sa source et sa première confluence et mont avec chaque confluence.",
+    "une classification simple basée sur la pente et la hauteur",
+    "indique la classe d'utilisation des sols la plus dominante dans la zone du fond de vallée de chaque segment de cours d'eau",
+    "indique la part de la couverture urbaine dans la zone du fond de vallée de chaque segment de cours d'eau",
+    "indique la part de l'utilisation des terres agricoles dans la zone du fond de vallée de chaque segment de cours d'eau",
+    "indique la part de l'utilisation naturelle des sols dans la zone du fond de vallée de chaque tronçon fluvial",
+    "L'indice de confinement proposé, de 0 à 1, est divisé en 4 classes : \n
+      - espace abondant : > 70 \n
+      - espace : > 40 \n
+      - espace modéré : > 10 \n
+      - confiné : 0 \n
+      basé sur le rapport entre la largeur du canal actif et la largeur du fond de la vallée.",
+    "basé sur la surface du corridor connecté (comprenant le canal actif, le corridor naturel et les corridors semi-naturels) à partir du fond de la vallée OU basé sur la surface du corridor connecté à partir du fond de la vallée, à l'exclusion de la zone du canal actif OU basé sur le rapport entre la largeur du corridor connecté et la largeur du canal actif !",
+    "la présence de bancs de galets : Absent, occasionnel, fréquent",
+    "*indique une réduction de la taille des chenaux sur le réseau de cours d'eau vers le bas* \n
+      - grandissant \n
+      - stable \n
+      - diminuant \n"
+  )
+)
+
+table <- reactable(df, 
+                   columns = list(
+                     class = colDef(name = "Style", sortable = FALSE),
+                     description = colDef(show = FALSE)  # Hide the detail column in the main view
+                   ),
+                   details = function(index) {
+                     htmltools::div(
+                       style = "padding: 10px; margin-left: 84px; white-space: pre-wrap;",  # Add text indentation
+                       # htmltools::strong("Details: "),
+                       df$description[index]  # Display the detail column for the specific row
+                     )
+                   }, selection = "single", defaultSelected = 1, onClick = "select")
+table
+
+```
+
+### Procedure
+
+- click on region: table is shown with strahler nombre selected
+- subsequently, network with sld-styling from class is added to map
+- 
+
 
 ## Topography
 
 based on height and slope, e.g.
 
-- plaines de basse altitude (\> 0 m & \< 5 % slope)
-- plaines de moyenne altitude (\> 300 m & \< 5 % slope)
-- plaines de montagne (\> 1000 m & \< 5 % slope)
-- pentes de basse altitude (\> 0 m & \> 5 % slope)
-- pentes de moyenne altitude (\> 300 m & \> 5 % slope)
-- pentes de montagne (\> 1000 m & \> 5 % slope)
+-   plaines de basse altitude (\> 0 m & \< 5 % slope)
+-   plaines de moyenne altitude (\> 300 m & \< 5 % slope)
+-   plaines de montagne (\> 1000 m & \< 5 % slope)
+-   pentes de basse altitude (\> 0 m & \> 5 % slope)
+-   pentes de moyenne altitude (\> 300 m & \> 5 % slope)
+-   pentes de montagne (\> 1000 m & \> 5 % slope)
 
 ```{r plot topographical classes}
 #| echo: false
@@ -55,7 +120,6 @@ leaflet::leaflet(df_classified_pc) |>
   addPolylines(color = df_classified_pc$color_topo, opacity = 1) |> 
   addLegend(color = unique(df_classified_pc$color_topo), labels = unique(df_classified_pc$class_topo))
 ```
-
 
 ## Dominant land use
 
@@ -136,7 +200,6 @@ leaflet::leaflet(df_classified_pc) |>
   addLegend(color = unique(df_classified_pc$color_natural), labels = unique(df_classified_pc$class_natural))
 ```
 
-
 ## Confinement
 
 Proposed confinement index from 0-1 divided into 4 classes:
@@ -158,12 +221,9 @@ leaflet::leaflet(df_classified_pc) |>
   addLegend(color = unique(df_classified_pc$color_confinement), labels = unique(df_classified_pc$class_confinement))
 ```
 
-
 ## Habitat Connectivity
 
-based on share of connected corridor (includes active channel, natural corridor and semi-natural corridors) from valley bottom
-OR based on share of connected corridor from valley bottom excluding the active channel area
-OR based on the ratio of connected corridor width to active channel width !
+based on share of connected corridor (includes active channel, natural corridor and semi-natural corridors) from valley bottom OR based on share of connected corridor from valley bottom excluding the active channel area OR based on the ratio of connected corridor width to active channel width !
 
 Example based on connected corridor share:
 
@@ -176,7 +236,6 @@ leaflet::leaflet(df_classified_pc) |>
   addPolylines(color = df_classified_pc$color_habitat, opacity = 1) |> 
   addLegend(color = unique(df_classified_pc$color_habitat), labels = unique(df_classified_pc$class_habitat))
 ```
-
 
 ## Active Channel Space
 
@@ -199,7 +258,6 @@ leaflet::leaflet(df_classified_pc) |>
   addLegend(color = unique(df_classified_pc$color_ac), labels = unique(df_classified_pc$class_ac))
 ```
 
-
 ## Gravel Bars presence
 
 Absent, occasional, frequent
@@ -214,15 +272,14 @@ leaflet::leaflet(df_classified_pc) |>
   addLegend(color = unique(df_classified_pc$color_gravel), labels = unique(df_classified_pc$class_gravel))
 ```
 
-
 ## Water channel size evolution
 
-*indicate channel size reductions on the stream network downwards* 
+*indicate channel size reductions on the stream network downwards*
 
- - grandissant
- - stable
- - diminuant
- 
+-   grandissant
+-   stable
+-   diminuant
+
 ```{r plot water channel size classes}
 #| echo: false
 #| warning: false
@@ -237,39 +294,32 @@ leaflet::leaflet(df_classified_pc) |>
 ## Stream Power
 
 ***Idea:** get discharge values from RHT network and calculate Streampower for each segment:*
-  
-  $$
-  \Omega=\rho g Q S
-$$
-  
-  `Ω` is the stream power, `ρ` is the density of water (1000 kg/m^3^), `g` is gravitational acceleration (9.8 m/s^2^ ), `Q` is Discharge (m^3^/s), and `S` is the channel slope.
 
+$$
+\Omega=\rho g Q S
+$$
+
+`Ω` is the stream power, `ρ` is the density of water (1000 kg/m^3^), `g` is gravitational acceleration (9.8 m/s^2^ ), `Q` is Discharge (m^3^/s), and `S` is the channel slope.
 
 ## Sinuosity
 
-
 ## Channel Pattern
-
 
 ## Bed Material
 
 based on grainsize distribution
 
-
 ## Flow regime
 
 perennial or intermittent?
-
 
 ## Slope Gradient
 
 low, medium, high
 
-
 ## Fragmentation
 
 based on barriers present upstream
-
 
 ## Integrated Approach
 

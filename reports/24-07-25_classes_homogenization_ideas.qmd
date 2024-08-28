@@ -1,0 +1,342 @@
+---
+title: "Clustering options HMM"
+format: html
+---
+
+```{r}
+library(tidyverse)
+library(depmixS4)
+library(plotly)
+library(sf)
+
+source("~/repositories/mapdo_progress-reports/src/f_database.R")
+source("~/repositories/mapdoapp_new-design/R/fct_plot_long.R")
+
+# load network metrics
+isere <- load_network_metrics() |> 
+  filter(axis == 2000788975) |> 
+  mutate(
+    class_name = as.factor(case_when(
+      crops_pc > 75 ~ "heavy",
+      crops_pc > 50 ~ "active",
+      crops_pc > 25 ~ "moderate",
+      crops_pc >= 0 ~ "no",
+    )),
+    color = case_when(
+      class_name == "heavy" ~ "red",
+      class_name == "active" ~ "orange",
+      class_name == "moderate" ~ "yellow",
+      class_name == "no" ~ "green",
+    ),
+  ) |> sf::st_drop_geometry() |>
+  na.omit() |> 
+  arrange(measure) |> 
+  head(400)
+
+# get shapes for background coloring of plot
+shapes <- create_classes_background(isere)
+
+# create plot
+plot <- lg_profile_main(
+  data = isere,
+  y = isere$crops_pc,
+  y_label = "crops",
+  y_label_category = "Landuse [%]"
+) |> 
+  layout(shapes = shapes)
+
+plot
+```
+
+```{r manual smoothing}
+# smooth out one unequal value if surrounded by group of at least 3 equal values
+isere_2 <- isere |> 
+  mutate(
+    lag_class = lag(class_name),
+    lead_class = lead(class_name),
+    lag2_class = lag(class_name, n = 2),
+    lead2_class = lead(class_name, n = 2),
+    lag3_class = lag(class_name, n = 3),
+    lead3_class = lead(class_name, n = 3),
+    # condition1 - two equal before and one equal after one unequal (B) in middle, e.g. AABA -> AAAA
+    condition1 = !is.na(lag_class) & !is.na(lead_class) &
+      (lag_class != class_name) &
+      (lag_class == lead_class) &
+      (lag2_class == lag_class),
+    # condition2 - one equal before and two equal after one unequal (B) in middle, e.g. CABAA -> CAAAA
+    condition2 = !is.na(lag_class) & !is.na(lead_class) &
+      (lag_class != class_name) &
+      (lag_class == lead_class) &
+      (lead2_class == lead_class) &
+      !condition1,
+    # condition3 - three equal before (A) and one or more unequal (C) after one unequal (B) in middle, e.g. AAABCC -> AAAACC
+    condition3 = !is.na(lag_class) & !is.na(lead_class) &
+      (lag_class != class_name) &
+      (lag_class != lead_class) &
+      (lead_class != class_name) &
+      (lag2_class == lag_class) &
+      (lag3_class == lag_class) &
+      !condition1 & !condition2,
+    # condition3 - one or more unequal (C) before and three equal (A) after one unequal (B) in middle, e.g. CCBAAA -> CCAAAA
+    condition4 = !is.na(lag_class) & !is.na(lead_class) &
+      (lag_class != class_name) &
+      (lag_class != lead_class) &
+      (lead_class != class_name) &
+      (lead2_class == lead_class) &
+      (lead3_class == lead_class) &
+      !condition1 & !condition2 & !condition3,
+  ) |> 
+  mutate(
+    group = case_when(condition1 ~ lag2_class, 
+                      condition2 ~ lead2_class,
+                      condition3 ~ lag2_class,
+                      condition4 ~ lead2_class,
+                      .default = class_name),
+    color = case_when(
+      group == "heavy" ~ "red",
+      group == "active" ~ "orange",
+      group == "moderate" ~ "yellow",
+      group == "no" ~ "green",
+    )
+  ) |> 
+  mutate(
+    class_name = group
+  ) |> 
+  select(-lag_class, -lead_class, -lag2_class, -lead2_class, -condition1, -condition2, -group)
+
+# get shapes for background coloring of plot
+shapes_grouped <- create_classes_background(isere_2)
+
+# create plot
+plot_grouped <- lg_profile_main(
+  data = isere_2,
+  y = isere_2$crops_pc,
+  y_label = "crops",
+  y_label_category = "Landuse [%]"
+) |> 
+  layout(shapes = shapes_grouped)
+
+plot
+plot_grouped
+```
+
+```{r function}
+
+smoothen_classes <- function(df, n_smooth) {
+  
+  
+  # get colors for classes
+  df_colors <- tibble(class_name = unique(df$class_name), color = unique(df$color))
+  
+  # 1 - smooth out one value if surrounded by group of at least 3 equal values
+  if (n_smooth == 1) {
+    
+    df_smooth <- df |> 
+      mutate(
+        lag = lag(class_name),
+        lead = lead(class_name),
+        lag2 = lag(class_name, n = 2),
+        lead2 = lead(class_name, n = 2),
+        lag3 = lag(class_name, n = 3),
+        lead3 = lead(class_name, n = 3),
+        # condition1 - two equal before and one equal after one unequal (B) in middle, e.g. AABA -> AAAA
+        condition1 = (lag != "unvalid") & (lag2 != "unvalid") & (lead != "unvalid") &
+          (lag != class_name) &
+          (lag == lead) &
+          (lag2 == lag),
+        # condition2 - one equal before and two equal after one unequal (B) in middle, e.g. CABAA -> CAAAA
+        condition2 = (lag != "unvalid") & (lead != "unvalid") & (lead2 != "unvalid") &
+          (lag != class_name) &
+          (lag == lead) &
+          (lead2 == lead) &
+          !condition1,
+        # condition3 - three equal before (A) and one or more unequal (C) after one unequal (B) in middle, e.g. AAABCC -> AAAACC
+        condition3 = (lag != "unvalid") & (lag2 != "unvalid") & (lag3 != "unvalid") &
+          (lag != class_name) &
+          (lag != lead) &
+          (lead != class_name) &
+          (lag2 == lag) &
+          (lag3 == lag) &
+          !condition1 & !condition2,
+        # condition4 - one or more unequal (C) before and three equal (A) after one unequal (B) in middle, e.g. CCBAAA -> CCAAAA
+        condition4 = (lead != "unvalid") & (lead2 != "unvalid") & (lead3 != "unvalid") &
+          (lag != class_name) &
+          (lag != lead) &
+          (lead != class_name) &
+          (lead2 == lead) &
+          (lead3 == lead) &
+          !condition1 & !condition2 & !condition3,
+      ) |> 
+      mutate(
+        group = case_when(condition1 ~ lag2, 
+                          condition2 ~ lead2,
+                          condition3 ~ lag2,
+                          condition4 ~ lead2,
+                          .default = class_name)
+      ) |> 
+      select(-condition4)
+  } 
+  
+  
+  # 2 - smooth out two unequal values if surrounded by group of at least 4 equal values
+  else if (n_smooth == 2) {
+    
+    df_smooth <- df |> 
+      mutate(
+        lag = lag(class_name),
+        lead = lead(class_name),
+        lag2 = lag(class_name, n = 2),
+        lead2 = lead(class_name, n = 2),
+        lag3 = lag(class_name, n = 3),
+        lead3 = lead(class_name, n = 3),
+        lag4 = lag(class_name, n = 4),
+        lead4 = lead(class_name, n = 4),
+        # condition1 - 3 equal (A) before and 1 equal after two unequal (B, C) in middle, e.g. AAABCA -> AAAAAA
+        condition1 = (lag != "unvalid") & (lag2 != "unvalid") & (lead2 != "unvalid") & (lag3 != "unvalid") &
+          (lag != class_name) &
+          (lag == lag2) &
+          (lag2 == lag3) &
+          (lag == lead2),
+        condition1_2 = (lag2 != "unvalid") & (lag3 != "unvalid") & (lag4 != "unvalid") & (lead != "unvalid") &
+          (lag2 != class_name) &
+          (lag2 == lag3) &
+          (lag3 == lag4) &
+          (lag2 == lead) & !condition1,
+        # condition2 - 1 equal (A) before and 3 equal after two unequal (B, C) in middle, e.g. CABCAAA -> CAAAAAA
+        condition2 = (lag != "unvalid") & (lead2 != "unvalid") & (lead3 != "unvalid") & (lead4 != "unvalid") &
+          (lag != class_name) &
+          (lead2 == lag) &
+          (lead3 == lag) &
+          (lead4 == lag) & !condition1 & !condition1_2,
+        condition2_2 = (lag2 != "unvalid") & (lead != "unvalid") & (lead2 != "unvalid") & (lead3 != "unvalid") &
+          (lag2 != class_name) &
+          (lead == lag2) &
+          (lead2 == lag2) &
+          (lead3 == lag2) & 
+          !condition1 & !condition1_2 & !condition2,
+        # condition3 - 2 equal (A) before and 2 equal after two unequal (B, C) in middle, e.g. CAABCAA -> CAAAAAA
+        condition3 = (lag != "unvalid") & (lag2 != "unvalid") & (lead2 != "unvalid") & (lead3 != "unvalid") &
+          (lag != class_name) &
+          (lag2 == lag) &
+          (lead2 == lag) &
+          (lead3 == lag) & 
+          !condition1 & !condition2 & !condition1_2 & !condition2_2,
+        condition3_2 = (lag2 != "unvalid") & (lag3 != "unvalid") & (lead != "unvalid") & (lead2 != "unvalid") &
+          (lag2 != class_name) &
+          (lag3 == lag2) &
+          (lead == lag2) &
+          (lead2 == lag2) &
+          !condition1 & !condition2 & !condition1_2 & !condition2_2 & !condition3,
+      ) |> 
+      mutate(
+        group = case_when(condition1 ~ lag2, 
+                          condition1_2 ~ lag2,
+                          condition2 ~ lead2,
+                          condition2_2 ~ lead2,
+                          condition3 ~ lag2,
+                          condition3_2 ~ lag2,
+                          .default = class_name)
+      ) |> 
+      select(-lag4, -lead4, -condition1_2, -condition2_2, -condition3_2)
+  }
+  
+  df_smooth <- df_smooth |> 
+    left_join(df_colors, by = join_by(group == class_name)) |> 
+    select(-lag, -lag2, -lag3, -lead, -lead2, -lead3, -condition1, -condition2, -condition3, -group)
+  
+  return(df_smooth)
+}
+
+isere2 <- smoothen_classes(isere, 2) 
+
+# get shapes for background coloring of plot
+shapes_grouped <- create_classes_background(isere_2)
+
+# create plot
+plot_grouped2 <- lg_profile_main(
+  data = isere_2,
+  y = isere_2$crops_pc,
+  y_label = "crops",
+  y_label_category = "Landuse [%]"
+) |> 
+  layout(shapes = shapes_grouped)
+
+plot
+plot_grouped
+plot_grouped2
+
+```
+
+```{r manual smoothing 2}
+isere_2 <- isere |> 
+  mutate(
+    lag = lag(class_name),
+    lead = lead(class_name),
+    lag2 = lag(class_name, n = 2),
+    lead2 = lead(class_name, n = 2),
+    lag3 = lag(class_name, n = 3),
+    lead3 = lead(class_name, n = 3),
+    condition1 = !is.na(lag) & !is.na(lead) &
+      ((lag == lead2) | (lag2 == lead)) &
+      (lag2 == lag3),
+    condition2 = !is.na(lag) & !is.na(lead) &
+      ((lag == lead2) | (lag2 == lead)) &
+      (lead2 == lead3) &
+      !condition1
+  ) |> 
+  mutate(
+    group = case_when(condition1 ~ lag2_class, 
+                      condition2 ~ lead2_class,
+                      .default = class_name),
+    color = case_when(
+      group == "heavy" ~ "red",
+      group == "active" ~ "orange",
+      group == "moderate" ~ "yellow",
+      group == "no" ~ "green",
+    )
+  ) |> 
+  mutate(
+    class_name = group
+  ) |> 
+  select(-lag_class, -lead_class, -lag2_class, -lead2_class, -condition1, -condition2, -group)
+
+```
+
+```{r automatic smoothing}
+# random number generator
+set.seed(1)
+
+# create model
+mod_clust <- depmixS4::depmix(
+  response = isere$class_name~1, # class_name as response variable
+  data = isere, # dataset with response variable
+  nstates = 4, # number of states
+  trstart = runif(16), # random uniform distribution of initial transition matrix
+  family = multinomial() # setting response variables distribution family to multinomial for factors
+)
+
+# fit model
+fm_clust <- depmixS4::fit(
+  mod_clust, 
+  emc = em.control(rand = FALSE)
+)
+
+# assign states to data
+isere_3 <- isere |> 
+  select(!c(class_name, color))
+isere_3$state_depmix <- depmixS4::posterior(fm_clust)$state
+
+# Capture the summary output as a string
+summary_output <- capture.output(summary(fm_clust))
+
+# Extract the lines containing the transition matrix
+transition_lines <- summary_output[grep("fromS", summary_output)]
+
+# Split the lines to extract the matrix elements
+transition_matrix <- do.call(rbind, lapply(transition_lines, function(line) {
+  as.numeric(unlist(strsplit(trimws(gsub("^.*fromS[0-9]+", "", line)), "\\s+")))
+}))
+
+# Print the transition matrix
+print(transition_matrix)
+```

@@ -38,7 +38,11 @@ autoclass_urban_pressure <- function(df){
   # variables among which to select the one with greatest value
   vars <- c("highly urbanised", "urbanised", "moderately urbanised", "no urban land")
   
-  colors <- c("#6a040f", "#ba181b", "#ffd97d", "#ffffff") |> setNames(vars) 
+  colors <- c("#6a040f", "#ba181b", "#ffd97d", "#ffffff") |> 
+    setNames(
+      c("highly urbanised", "urbanised", 
+        "moderately urbanised", "no urban land")
+      ) 
   
   classified_df <- df %>%
     rowwise() %>%
